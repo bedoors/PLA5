@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sphere on a rotating rod</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --wall: #e3e4e1;
+  --plate-hi: #f2f3f0;
+  --plate-lo: #d3d5d1;
+  --paper: #f6f7f5;
+  --ink: #1b1d1f;
+  --ink-2: #4a4f54;
+  --ink-3: #6b7176;
+  --rule: #c3c7c5;
+  --red: #b8121f;
+  --red-hi: #f27b82;
+  --red-lo: #5c070d;
+  --blue: #0a5f9e;
+  --orange: #a35f00;
+  --green: #00795a;
+  --good: #1d6b43;
+  --bad: #a3141e;
+  --wait: #8a5a00;
+  --wood-top: #dba864;
+  --wood-side: #bd8442;
+  --wood-end: #9b652c;
+  --wood-edge: #7a4c1e;
+  --brass: #c39a35;
+  --brass-hi: #efd88c;
+  --brass-lo: #7d5f17;
+  --motor: #1f2124;
+  --motor-hi: #5a5f65;
+  --pole: #8f959b;
+  --pole-hi: #e1e4e7;
+  --string: #2a2c2e;
+  --dim: #1b1d1f;
+  --target: #5f656a;
+  --halo: #eef0ed;
+  --focus: #0a5f9e;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #1f2123;
+    --plate-hi: #35383c;
+    --plate-lo: #222427;
+    --paper: #2a2d30;
+    --ink: #eceef0;
+    --ink-2: #b6bcc2;
+    --ink-3: #8f969c;
+    --rule: #464b50;
+    --red: #e0414b;
+    --red-hi: #ffa3a8;
+    --red-lo: #6f0b12;
+    --blue: #6bb2ef;
+    --orange: #f2b04f;
+    --green: #45d1a2;
+    --good: #63d69d;
+    --bad: #ff8087;
+    --wait: #f0c06a;
+    --wood-top: #c99654;
+    --wood-side: #a67337;
+    --wood-end: #855526;
+    --wood-edge: #5e3a16;
+    --brass: #b8913a;
+    --brass-hi: #e8cf85;
+    --brass-lo: #6e5317;
+    --motor: #0f1012;
+    --motor-hi: #50555b;
+    --pole: #6f757b;
+    --pole-hi: #c2c7cc;
+    --string: #d9dcdf;
+    --dim: #eceef0;
+    --target: #a3a9af;
+    --halo: #2e3134;
+    --focus: #6bb2ef;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --wall: #1f2123;
+  --plate-hi: #35383c;
+  --plate-lo: #222427;
+  --paper: #2a2d30;
+  --ink: #eceef0;
+  --ink-2: #b6bcc2;
+  --ink-3: #8f969c;
+  --rule: #464b50;
+  --red: #e0414b;
+  --red-hi: #ffa3a8;
+  --red-lo: #6f0b12;
+  --blue: #6bb2ef;
+  --orange: #f2b04f;
+  --green: #45d1a2;
+  --good: #63d69d;
+  --bad: #ff8087;
+  --wait: #f0c06a;
+  --wood-top: #c99654;
+  --wood-side: #a67337;
+  --wood-end: #855526;
+  --wood-edge: #5e3a16;
+  --brass: #b8913a;
+  --brass-hi: #e8cf85;
+  --brass-lo: #6e5317;
+  --motor: #0f1012;
+  --motor-hi: #50555b;
+  --pole: #6f757b;
+  --pole-hi: #c2c7cc;
+  --string: #d9dcdf;
+  --dim: #eceef0;
+  --target: #a3a9af;
+  --halo: #2e3134;
+  --focus: #6bb2ef;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--wall);
+  color: var(--ink);
+  font: 400 1rem/1.5 "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.m, .m i { font-family: "STIX Two Text", "Times New Roman", Times, serif; }
+i { font-style: italic; }
+sub { font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 0.68em; font-style: normal; line-height: 0; vertical-align: -0.32em; margin-left: 0.04em; }
+sup { font-size: 0.7em; line-height: 0; }
+
+.wrap {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 22px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+@media (min-width: 700px) {
+  .wrap {
+    padding-top: 32px;
+    padding-left: max(28px, env(safe-area-inset-left, 0px));
+    padding-right: max(28px, env(safe-area-inset-right, 0px));
+  }
+}
+h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.15rem + 2.3vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  font-weight: 700;
+}
+.lede { margin: 10px 0 0; max-width: 66ch; color: var(--ink-2); font-size: 1.0625rem; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 24px; }
+@media (min-width: 980px) {
+  .layout { grid-template-columns: minmax(0, 1.72fr) minmax(330px, 1fr); gap: 30px; align-items: start; }
+}
+
+/* the simulation plate */
+.stage { border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; background: var(--paper); }
+.plate { position: relative; background: radial-gradient(115% 90% at 50% 28%, var(--plate-hi), var(--plate-lo)); }
+.plate canvas { display: block; width: 100%; aspect-ratio: 1 / 1; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.plate canvas:active { cursor: grabbing; }
+@media (min-width: 560px) { .plate canvas { aspect-ratio: 4 / 3; } }
+@media (min-width: 980px) { .plate canvas { aspect-ratio: 16 / 11; } }
+.status {
+  position: absolute; top: 12px; left: 12px; margin: 0;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 11px 5px 9px; border-radius: 999px;
+  background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  border: 1px solid var(--rule);
+  font-size: 0.875rem; font-weight: 700;
+}
+.status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.status[data-state="match"] .dot { background: var(--good); }
+.status[data-state="nomatch"] .dot { background: var(--bad); }
+.status[data-state="wait"] .dot { background: var(--wait); }
+.speed-tag {
+  position: absolute; top: 12px; right: 12px; margin: 0;
+  padding: 5px 10px; border-radius: 999px; font-size: 0.8125rem;
+  background: var(--ink); color: var(--paper);
+}
+.photo-note {
+  position: absolute; left: 12px; bottom: 12px; margin: 0; max-width: min(46ch, calc(100% - 24px));
+  padding: 6px 10px; border-radius: 8px; border: 1px solid var(--rule);
+  background: var(--paper); background: color-mix(in srgb, var(--paper) 92%, transparent);
+  font-size: 0.875rem; color: var(--ink-2);
+}
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 10px 12px; border-top: 1px solid var(--rule); background: var(--paper);
+}
+.toolbar .grow { flex: 1 1 0; min-width: 0; }
+.key { margin: 0; padding: 0 12px 12px; background: var(--paper); font-size: 0.8125rem; color: var(--ink-3); }
+
+button { font: inherit; color: inherit; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 40px; padding: 7px 12px;
+  border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--paper); color: var(--ink);
+  font-size: 0.9375rem; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn.primary { min-width: 96px; justify-content: center; background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn[aria-pressed="true"]:not(.primary) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--rule); border-radius: 10px; background: var(--wall); }
+.seg button {
+  min-height: 34px; padding: 4px 11px; border: 0; border-radius: 7px;
+  background: transparent; color: var(--ink-2); font-size: 0.9375rem; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--rule); }
+.check { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 4px; font-size: 0.9375rem; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+
+/* control column */
+.panel { display: grid; gap: 26px; }
+.panel h2 { margin: 0 0 10px; font-size: 1rem; font-weight: 700; }
+.period-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.period-head label { font-weight: 700; }
+.period-val { font-family: "STIX Two Text", "Times New Roman", serif; font-size: 1.9rem; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+input[type="range"] { display: block; width: 100%; height: 30px; margin: 12px 0 2px; accent-color: var(--ink); cursor: pointer; }
+.range-ends { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--ink-3); }
+.angle-head { margin-top: 20px; }
+.link-note { margin: 10px 0 0; font-size: 0.8125rem; color: var(--ink-3); }
+.presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.preset {
+  display: grid; gap: 1px; text-align: left;
+  padding: 9px 12px; border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--paper); cursor: pointer;
+}
+.preset:hover { border-color: var(--ink-3); }
+.preset .p-name { font-size: 0.875rem; color: var(--ink-2); }
+.preset .p-val { font-family: "STIX Two Text", "Times New Roman", serif; font-size: 1.3rem; line-height: 1.2; }
+.preset[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin: 0; }
+.stats > div { min-width: 0; }
+.stats dt { font-size: 0.8125rem; color: var(--ink-2); line-height: 1.3; }
+.stats dd { margin: 0; }
+.stats .v { margin-top: 3px; font-family: "STIX Two Text", "Times New Roman", serif; font-size: 1.55rem; line-height: 1.15; font-variant-numeric: lining-nums tabular-nums; }
+.stats .cmp { font-size: 0.8125rem; color: var(--ink-3); }
+.stats .cmp.ok { color: var(--good); }
+.stats .cmp.no { color: var(--bad); }
+.settle { margin: 14px 0 0; font-size: 0.875rem; color: var(--ink-2); max-width: 52ch; }
+
+.fbd-canvas { display: block; width: 100%; height: 252px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); }
+.fbd-cap { margin: 8px 0 0; font-size: 0.8125rem; color: var(--ink-3); }
+.eqs { display: grid; gap: 12px; margin-top: 16px; }
+.eq { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 12px; align-items: baseline; }
+.eq .name { grid-column: 1 / -1; font-size: 0.8125rem; color: var(--ink-2); }
+.eq .law, .eq .num { font-family: "STIX Two Text", "Times New Roman", serif; font-size: 1.0625rem; }
+.eq .num { white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
+.eq .num.ok { color: var(--good); }
+.eq .num.no { color: var(--bad); }
+.eq.student { padding-top: 12px; border-top: 1px dashed var(--rule); }
+
+/* evaluation */
+.eval { margin-top: 30px; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper); }
+.eval summary {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; cursor: pointer; list-style: none;
+  font-size: 1.0625rem; font-weight: 700;
+}
+.eval summary::-webkit-details-marker { display: none; }
+.eval summary::before {
+  content: ""; flex: none; width: 8px; height: 8px; margin: 0 2px 0 3px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg); transition: transform 0.15s ease;
+}
+.eval[open] summary::before { transform: rotate(45deg); }
+.eval-body { padding: 0 18px 22px 42px; max-width: 78ch; }
+.eval-body > p { margin: 0 0 14px; }
+.mistake { margin: 18px 0; padding-left: 14px; border-left: 3px solid var(--bad); }
+.mistake h3 { margin: 0 0 2px; font-size: 1rem; }
+.mistake .where { margin: 0 0 6px; color: var(--ink-2); font-size: 0.9375rem; }
+.mistake p:last-child { margin: 0; }
+.sol-h { margin: 22px 0 8px; font-size: 1rem; }
+.derivation {
+  margin: 0 0 14px; padding: 12px 16px; border-radius: 10px; background: var(--wall);
+  font-family: "STIX Two Text", "Times New Roman", serif; font-size: 1.0625rem; overflow-x: auto;
+}
+.derivation p { margin: 5px 0; white-space: nowrap; }
+.derivation .lbl { display: inline-block; min-width: 8.6em; font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 0.875rem; color: var(--ink-2); }
+.foot { margin: 20px 0 0; max-width: 84ch; font-size: 0.875rem; color: var(--ink-3); }
+
+@media (max-width: 420px) {
+  .btn { padding: 7px 10px; }
+  .seg button { padding: 4px 9px; }
+  .eval-body { padding-left: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eval summary::before { transition: none; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Sphere on a rotating rod</h1>
+    <p class="lede">A sphere hangs on a string from a rod that spins at constant speed. Pick a rotation period or a string angle and watch where the sphere settles. In the problem’s photo the string makes 60° with the horizontal and the sphere is 36.0 cm from the axis.</p>
+  </header>
+
+  <div class="layout">
+    <section class="stage" id="stage" aria-label="Simulation">
+      <div class="plate">
+        <canvas id="scene" role="img" aria-label="Animated view of the rod, string and sphere turning about the vertical axis"></canvas>
+        <p class="status" id="status" data-state="match" aria-live="polite"><span class="dot" aria-hidden="true"></span><span id="statusText">Matches the photo</span></p>
+        <p class="speed-tag" id="speedTag" hidden>Slow motion, 0.25×</p>
+        <p class="photo-note" id="photoNote" hidden>Frozen at the instant in the photo, with the sphere in the plane facing you. Press Play to resume.</p>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" id="playBtn" type="button"></button>
+        <button class="btn" id="slowBtn" type="button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18 8.5 12.5"/></svg>
+          <span>Slow motion</span>
+        </button>
+        <button class="btn" id="photoBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.4"/></svg>
+          <span>Photo instant</span>
+        </button>
+        <button class="btn" id="restartBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4.5 4v4.5H9"/></svg>
+          <span>Spin up from rest</span>
+        </button>
+        <span class="grow"></span>
+        <div class="seg" role="group" aria-label="Camera angle">
+          <button type="button" data-view="angled" aria-pressed="true">Angled</button>
+          <button type="button" data-view="side" aria-pressed="false">Side</button>
+          <button type="button" data-view="top" aria-pressed="false">Top</button>
+        </div>
+        <label class="check"><input type="checkbox" id="forcesChk" checked> Forces</label>
+      </div>
+      <p class="key">Dashed ring: the sphere’s path in the photo. Red trace: its last revolution. Drag the picture to turn the camera.</p>
+    </section>
+
+    <aside class="panel" aria-label="Controls and readings">
+      <section>
+        <div class="period-head">
+          <label for="period">Rotation period</label>
+          <output id="periodOut" for="period" class="period-val"><i>T</i> = 1.58 s</output>
+        </div>
+        <input type="range" id="period" min="0.5" max="3" step="0.01" value="1.58">
+        <div class="range-ends"><span>0.50 s</span><span>3.00 s</span></div>
+        <div class="period-head angle-head">
+          <label for="angle">String angle</label>
+          <output id="angleOut" for="angle" class="period-val"><i>θ</i> = 60.0°</output>
+        </div>
+        <input type="range" id="angle" min="6" max="86" step="0.5" value="60">
+        <div class="range-ends"><span>6°</span><span>86°</span></div>
+        <p class="link-note">The two sliders are linked: each string angle goes with exactly one rotation period.</p>
+        <div class="presets">
+          <button class="preset" type="button" data-preset="students" aria-pressed="false"><span class="p-name">Students’ answer</span><span class="p-val">0.70 s</span></button>
+          <button class="preset" type="button" data-preset="correct" aria-pressed="true"><span class="p-name">Correct answer</span><span class="p-val">1.58 s</span></button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Readings</h2>
+        <dl class="stats">
+          <div><dt>String angle from horizontal</dt><dd class="v" id="rTheta">60.0°</dd><dd class="cmp" id="cTheta">Photo: 60°</dd></div>
+          <div><dt>Sphere’s distance from axis</dt><dd class="v" id="rR">36.0 cm</dd><dd class="cmp" id="cR">Photo: 36.0 cm</dd></div>
+          <div><dt>Speed</dt><dd class="v" id="rV">1.43 m/s</dd></div>
+          <div><dt>String’s force on sphere</dt><dd class="v" id="rF">1.15 <i>mg</i></dd></div>
+        </dl>
+        <p class="settle" id="settle"></p>
+      </section>
+
+      <section>
+        <h2>Forces on the sphere</h2>
+        <canvas id="fbd" class="fbd-canvas" role="img" aria-label="Force diagram: the string’s force and Earth’s force on the sphere, with the sphere’s acceleration drawn as m times a"></canvas>
+        <p class="fbd-cap">To scale. Dashed arrows are the components of the string’s force. The green arrow is <i class="m">m</i><b class="m">a</b>; once the motion is steady it equals the horizontal component.</p>
+        <div class="eqs">
+          <div class="eq"><span class="name">Vertical, no acceleration</span><span class="law"><i>F</i><sub>S on Sp</sub> sin <i>θ</i> = <i>F</i><sub>E on Sp</sub></span><span class="num" id="eqV"></span></div>
+          <div class="eq"><span class="name">Toward the axis, acceleration <i class="m">v</i>²/<i class="m">R</i></span><span class="law"><i>F</i><sub>S on Sp</sub> cos <i>θ</i> = <i>mv</i>²/<i>R</i></span><span class="num" id="eqH"></span></div>
+          <div class="eq student"><span class="name">The students’ step</span><span class="law"><i>F</i><sub>S on Sp</sub> = <i>mv</i>²/<i>R</i></span><span class="num" id="eqS"></span></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <details class="eval" id="eval">
+    <summary>Evaluation of the students’ solution</summary>
+    <div class="eval-body">
+      <p>The first step is right. The sphere doesn’t accelerate up or down, so the vertical component of the string’s force balances Earth’s pull: <span class="m"><i>F</i><sub>S on Sp</sub> sin 60° = <i>F</i><sub>E on Sp</sub> = <i>mg</i></span>. The mistakes come after that.</p>
+
+      <div class="mistake">
+        <h3>The whole string force is set equal to <span class="m"><i>mv</i>²/<i>R</i></span></h3>
+        <p class="where">Their line: <span class="m"><i>F</i><sub>S on Sp</sub> = <i>mv</i>²/<i>R</i></span></p>
+        <p>The sphere’s acceleration, <span class="m"><i>v</i>²/<i>R</i></span>, points horizontally toward the axis, so <span class="m"><i>mv</i>²/<i>R</i></span> equals the net force on the sphere. Earth’s pull cancels the vertical part of the string’s force, which leaves only the horizontal component: <span class="m"><i>F</i><sub>S on Sp</sub> cos 60° = <i>mv</i>²/<i>R</i></span>. At 60° that’s half of the string’s force, as the force diagram shows.</p>
+      </div>
+
+      <div class="mistake">
+        <h3>The radius is wrong</h3>
+        <p class="where">Their line: <span class="m"><i>R</i> = 0.36 m − 0.12 m</span></p>
+        <p>The sphere circles the rotation axis, so <span class="m"><i>R</i></span> is its distance from the axis: 0.360 m. The 12.0 cm only says where the string is tied. Subtracting it gives the sphere’s horizontal distance from the tie point, which isn’t the radius of any circle the sphere moves on.</p>
+      </div>
+
+      <div class="mistake">
+        <h3>sin 60° is entered as 0.5</h3>
+        <p class="where">Their line: the denominator under the square root</p>
+        <p>sin 60° = 0.866. The value 0.5 is cos 60°.</p>
+      </div>
+
+      <h3 class="sol-h">Corrected solution</h3>
+      <div class="derivation">
+        <p><span class="lbl">Vertical</span><i>F</i><sub>S on Sp</sub> sin 60° = <i>mg</i></p>
+        <p><span class="lbl">Toward the axis</span><i>F</i><sub>S on Sp</sub> cos 60° = <i>mv</i>²/<i>R</i></p>
+        <p><span class="lbl">Divide the two</span>tan 60° = <i>gR</i>/<i>v</i>²</p>
+        <p><span class="lbl">Speed</span><i>v</i> = √(<i>gR</i> / tan 60°) = √((9.8 m/s²)(0.360 m) / 1.732) = 1.43 m/s</p>
+        <p><span class="lbl">Period</span><i>T</i> = 2π<i>R</i> / <i>v</i> = 2π(0.360 m) / (1.43 m/s) = 1.58 s ≈ 1.6 s</p>
+      </div>
+      <p>The mass cancels, and neither the 50.0 cm string length nor the 12.0 cm offset is needed. As a check, the students’ 0.70 s would swing the sphere out until the string is only about 12° below horizontal, almost level with the rod.</p>
+      <button class="btn" id="demoStudents" type="button">Run the sim at 0.70 s</button>
+    </div>
+  </details>
+
+  <p class="foot">Model: the sphere is a point mass on a light string that doesn’t stretch, with <i class="m">g</i> = 9.80 m/s². Damping on the sphere’s motion relative to the rod makes any swinging die out, so the sphere settles into steady circular motion; once the motion is steady the damping does nothing. The photo’s labels are measurements and disagree by about 1 cm: 12.0 cm + 50.0 cm × cos 60° = 37.0 cm, not 36.0 cm. Because the period depends only on the radius and the angle, the sim keeps 36.0 cm, 60° and the 12.0 cm offset, which makes its string 48.0 cm long.</p>
+</main>
+
+<script>
+'use strict';
+const DEG = Math.PI / 180;
+
+/* ---------------- physics ----------------
+   Inertial frame, z up. The string is tied to the rod at distance D_ATT from the axis;
+   the tie point moves on a circle at the motor's angular speed om. The sphere is a point
+   mass on a taut string of length L (constraint force computed exactly, then projected).
+   Damping acts on the sphere's velocity relative to the rod, so steady motion is undamped. */
+const Phys = (() => {
+  const g = 9.80;
+  const D_ATT = 0.12, R_PHOTO = 0.36, TH_PHOTO = 60 * DEG;
+  const L = (R_PHOTO - D_ATT) / Math.cos(TH_PHOTO);          // 0.48 m
+  const Z_PHOTO = -L * Math.sin(TH_PHOTO);                     // sphere height in the photo
+  const T_CORRECT = 2 * Math.PI * Math.sqrt(R_PHOTO * Math.tan(TH_PHOTO) / g);
+  const GAMMA = 4, MOTOR_K = 3, MOTOR_AMAX = 6, H_STEP = 1 / 480;
+  const KEYS = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'phi', 'om'];
+  const S = { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, phi: 0, om: 0 };
+  let omTarget = 2 * Math.PI / T_CORRECT;
+
+  function motorAccel(om) {
+    const a = MOTOR_K * (omTarget - om);
+    return Math.max(-MOTOR_AMAX, Math.min(MOTOR_AMAX, a));
+  }
+
+  function deriv(s, out) {
+    const om = s.om, omDot = motorAccel(om);
+    const c = Math.cos(s.phi), sn = Math.sin(s.phi);
+    const px = D_ATT * c, py = D_ATT * sn;
+    const vpx = -D_ATT * om * sn, vpy = D_ATT * om * c;
+    const apx = -D_ATT * (om * om * c + omDot * sn);
+    const apy = -D_ATT * (om * om * sn - omDot * c);
+    const rx = s.x - px, ry = s.y - py, rz = s.z;               // tie point -> sphere
+    const ux = s.vx - vpx, uy = s.vy - vpy, uz = s.vz;          // velocity relative to tie point
+    const wx = s.vx + om * s.y, wy = s.vy - om * s.x, wz = s.vz; // velocity relative to rod
+    const ex = -GAMMA * wx, ey = -GAMMA * wy, ez = -g - GAMMA * wz;
+    const lam = (rx * (ex - apx) + ry * (ey - apy) + rz * ez + ux * ux + uy * uy + uz * uz) / (L * L);
+    out.x = s.vx; out.y = s.vy; out.z = s.vz;
+    out.vx = ex - lam * rx; out.vy = ey - lam * ry; out.vz = ez - lam * rz;
+    out.phi = om; out.om = omDot;
+    return lam;                                                 // tension / (m L)
+  }
+
+  function constrain() {
+    const c = Math.cos(S.phi), sn = Math.sin(S.phi);
+    const px = D_ATT * c, py = D_ATT * sn;
+    let rx = S.x - px, ry = S.y - py, rz = S.z;
+    const k = L / Math.hypot(rx, ry, rz);
+    rx *= k; ry *= k; rz *= k;
+    S.x = px + rx; S.y = py + ry; S.z = rz;
+    const vpx = -D_ATT * S.om * sn, vpy = D_ATT * S.om * c;
+    let ux = S.vx - vpx, uy = S.vy - vpy, uz = S.vz;
+    const d = (ux * rx + uy * ry + uz * rz) / (L * L);
+    ux -= d * rx; uy -= d * ry; uz -= d * rz;
+    S.vx = vpx + ux; S.vy = vpy + uy; S.vz = uz;
+  }
+
+  const k1 = {}, k2 = {}, k3 = {}, k4 = {}, tmp = {};
+  function rk4(h) {
+    deriv(S, k1);
+    for (const k of KEYS) tmp[k] = S[k] + 0.5 * h * k1[k];
+    deriv(tmp, k2);
+    for (const k of KEYS) tmp[k] = S[k] + 0.5 * h * k2[k];
+    deriv(tmp, k3);
+    for (const k of KEYS) tmp[k] = S[k] + h * k3[k];
+    deriv(tmp, k4);
+    for (const k of KEYS) S[k] += h / 6 * (k1[k] + 2 * k2[k] + 2 * k3[k] + k4[k]);
+    constrain();
+  }
+  function advance(dt) {
+    const n = Math.max(1, Math.ceil(dt / H_STEP)), h = dt / n;
+    for (let i = 0; i < n; i++) rk4(h);
+  }
+
+  // steady state: tan(alpha) = om^2 (D_ATT + L sin alpha) / g, alpha from the vertical
+  function steadyGeometry(om) {
+    const k = om * om / g;
+    let lo = 0, hi = Math.PI / 2 - 1e-7;
+    for (let i = 0; i < 70; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (Math.tan(mid) > k * (D_ATT + L * Math.sin(mid))) hi = mid; else lo = mid;
+    }
+    const a = 0.5 * (lo + hi);
+    return { alpha: a, theta: Math.PI / 2 - a, R: D_ATT + L * Math.sin(a), z: -L * Math.cos(a) };
+  }
+  function setSteady(om) {
+    const geo = steadyGeometry(om);
+    S.om = om;
+    S.x = geo.R * Math.cos(S.phi); S.y = geo.R * Math.sin(S.phi); S.z = geo.z;
+    S.vx = -om * S.y; S.vy = om * S.x; S.vz = 0;
+  }
+  function restFromHanging() {
+    S.x = D_ATT * Math.cos(S.phi); S.y = D_ATT * Math.sin(S.phi); S.z = -L;
+    S.vx = 0; S.vy = 0; S.vz = 0; S.om = 0;
+  }
+  function rotateAbout(delta) {
+    const c = Math.cos(delta), s = Math.sin(delta);
+    let a = S.x * c - S.y * s, b = S.x * s + S.y * c; S.x = a; S.y = b;
+    a = S.vx * c - S.vy * s; b = S.vx * s + S.vy * c; S.vx = a; S.vy = b;
+    S.phi += delta;
+  }
+  function relSpeed() { return Math.hypot(S.vx + S.om * S.y, S.vy - S.om * S.x, S.vz); }
+
+  const dm = {};
+  function measure() {
+    const lam = deriv(S, dm);
+    const c = Math.cos(S.phi), sn = Math.sin(S.phi);
+    const ex = (D_ATT * c - S.x) / L, ey = (D_ATT * sn - S.y) / L, ez = -S.z / L; // sphere -> tie point
+    const Tmg = lam * L / g;
+    const R = Math.hypot(S.x, S.y) || 1e-9;
+    const rx = S.x / R, ry = S.y / R;
+    const v2 = S.vx * S.vx + S.vy * S.vy + S.vz * S.vz;
+    return {
+      Tmg, R, ex, ey, ez,
+      theta: Math.asin(Math.max(-1, Math.min(1, ez))),
+      v: Math.sqrt(v2),
+      hS: -Tmg * (ex * rx + ey * ry),        // string force toward the axis, in mg
+      vS: Tmg * ez,                          // string force upward, in mg
+      aH: -(dm.vx * rx + dm.vy * ry) / g,    // acceleration toward the axis, in g
+      mv2R: v2 / (g * R)
+    };
+  }
+
+  return {
+    g, D_ATT, R_PHOTO, TH_PHOTO, L, Z_PHOTO, T_CORRECT, S,
+    get omTarget() { return omTarget; }, set omTarget(v) { omTarget = v; },
+    advance, steadyGeometry, setSteady, restFromHanging, rotateAbout, relSpeed, measure,
+    periodForAngle: (th) => 2 * Math.PI * Math.sqrt((D_ATT + L * Math.cos(th)) * Math.tan(th) / g)
+  };
+})();
+if (typeof document === 'undefined') globalThis.Phys = Phys;
+
+/* ---------------- page ---------------- */
+if (typeof document !== 'undefined') (() => {
+  const P = Phys, S = P.S;
+  const $ = (id) => document.getElementById(id);
+  const BALL_R = 0.025, ROD_HALF = 0.30, ROD_W = 0.016, ROD_H = 0.012, FORCE_SCALE = 0.10;
+  const VIEW_ELEV = { angled: 18 * DEG, side: 0, top: 76 * DEG };
+  const T_STUDENTS = 0.70;
+  const SANS = '"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif';
+  const SERIF = '"STIX Two Text", "Times New Roman", Times, serif';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z" fill="currentColor"/></svg>';
+
+  let Tset = P.T_CORRECT;
+  let playing = !reduceMotion, slow = false, photoMode = false, showForces = true;
+  let simTime = 0, steady = true, needsRender = true, forceUI = true;
+  let trail = [];
+  const cam = { elev: VIEW_ELEV.angled, azim: -Math.PI / 2, D: 3.2, tz: -0.22 };
+  let C = {};
+
+  const fmt = (x, n) => {
+    const p = Math.pow(10, n);
+    let r = Math.round(x * p) / p;
+    if (Math.abs(r) < 0.5 / p) r = 0;
+    return r.toFixed(n);
+  };
+
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    const names = ['ink', 'ink-2', 'ink-3', 'rule', 'paper', 'red', 'red-hi', 'red-lo', 'blue', 'orange', 'green',
+      'string', 'dim', 'target', 'halo', 'wood-top', 'wood-side', 'wood-end', 'wood-edge', 'brass', 'brass-hi',
+      'brass-lo', 'motor', 'motor-hi', 'pole', 'pole-hi'];
+    C = {};
+    for (const n of names) C[n.replace(/-(\w)/g, (_, ch) => ch.toUpperCase())] = cs.getPropertyValue('--' + n).trim();
+  }
+
+  /* ---------- canvases and camera ---------- */
+  const scene = $('scene'), ctxS = scene.getContext('2d');
+  const fbd = $('fbd'), ctxF = fbd.getContext('2d');
+  let SW = 0, SH = 0, FW = 0, FH = 0, DPR = 1;
+  let camF = [0, 0, 1], camR = [1, 0, 0], camU = [0, 1, 0], camC = [0, 0, 0], focal = 1, ocx = 0, ocy = 0;
+
+  function updateCamera() {
+    const ce = Math.cos(cam.elev), se = Math.sin(cam.elev), ca = Math.cos(cam.azim), sa = Math.sin(cam.azim);
+    camF = [-ce * ca, -ce * sa, -se];
+    camR = [-sa, ca, 0];
+    camU = [-ca * se, -sa * se, ce];
+    camC = [cam.D * ce * ca, cam.D * ce * sa, cam.tz + cam.D * se];
+  }
+  // Framing: fit the rod, the photo's ring, the steady circle for the chosen period and
+  // wherever the sphere has been lately. Zoom out quickly, zoom in slowly.
+  let fit = null;
+  const hold = { R: 0, zLo: 0, zHi: 0 };
+  function resetHold() { hold.R = Math.hypot(S.x, S.y); hold.zLo = S.z; hold.zHi = S.z; }
+  function updateHold(dt) {
+    const R = Math.hypot(S.x, S.y), z = S.z, a = 1 - Math.exp(-dt / 1.2);
+    hold.R = R > hold.R ? R : hold.R + (R - hold.R) * a;
+    hold.zLo = z < hold.zLo ? z : hold.zLo + (z - hold.zLo) * a;
+    hold.zHi = z > hold.zHi ? z : hold.zHi + (z - hold.zHi) * a;
+  }
+  function fitTarget() {
+    updateCamera();
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const add = (x, y, z) => {
+      const q = z - cam.tz;
+      const sr = cam.D / (cam.D + x * camF[0] + y * camF[1] + q * camF[2]);   // perspective
+      const xc = (x * camR[0] + y * camR[1]) * sr;
+      const yc = (x * camU[0] + y * camU[1] + q * camU[2]) * sr;
+      if (xc < x0) x0 = xc; if (xc > x1) x1 = xc;
+      if (yc < y0) y0 = yc; if (yc > y1) y1 = yc;
+    };
+    const ring = (r, z) => { for (let i = 0; i < 36; i++) { const p = i / 36 * 2 * Math.PI; add(r * Math.cos(p), r * Math.sin(p), z); } };
+    const geo = P.steadyGeometry(P.omTarget);
+    ring(ROD_HALF, ROD_H + 0.004); ring(ROD_HALF, 0);
+    ring(P.R_PHOTO + BALL_R, P.Z_PHOTO + BALL_R); ring(P.R_PHOTO + BALL_R, P.Z_PHOTO - BALL_R);
+    ring(geo.R + BALL_R, geo.z + BALL_R); ring(geo.R + BALL_R, geo.z - BALL_R);
+    ring(hold.R + BALL_R, hold.zHi + BALL_R); ring(hold.R + BALL_R, hold.zLo - BALL_R);
+    ring(P.D_ATT + 0.03, -P.L - BALL_R);
+    add(0, 0, 0.08);
+    if (photoMode) ring(geo.R, geo.z - 0.1);
+    else if (showForces) { ring(geo.R, geo.z - 0.145); ring(hold.R, hold.zLo - 0.145); }
+    const note = document.getElementById('photoNote');
+    const padX = 16, padTop = 54, padBot = photoMode ? (note.offsetHeight || 40) + 22 : 18;
+    const availW = Math.max(40, SW - 2 * padX), availH = Math.max(40, SH - padTop - padBot);
+    const k = Math.min(availW / (x1 - x0), availH / (y1 - y0)) * 0.97;
+    return { k, cx: SW / 2 - k * (x0 + x1) / 2, cy: padTop + availH / 2 + k * (y0 + y1) / 2 };
+  }
+  function applyFit(dt, snap) {
+    const t = fitTarget();
+    if (!fit || snap) fit = t;
+    else {
+      const a = 1 - Math.exp(-dt / (t.k < fit.k ? 0.25 : 0.8));
+      fit = { k: fit.k + (t.k - fit.k) * a, cx: fit.cx + (t.cx - fit.cx) * a, cy: fit.cy + (t.cy - fit.cy) * a };
+    }
+    focal = fit.k * cam.D; ocx = fit.cx; ocy = fit.cy;
+    return Math.abs(fit.k - t.k) > 0.002 * t.k || Math.abs(fit.cx - t.cx) > 0.3 || Math.abs(fit.cy - t.cy) > 0.3;
+  }
+  function P3(x, y, z) {
+    const qx = x - camC[0], qy = y - camC[1], qz = z - camC[2];
+    const xc = qx * camR[0] + qy * camR[1] + qz * camR[2];
+    const yc = qx * camU[0] + qy * camU[1] + qz * camU[2];
+    const zc = qx * camF[0] + qy * camF[1] + qz * camF[2];
+    const s = focal / zc;
+    return { x: ocx + xc * s, y: ocy - yc * s, z: zc, s };
+  }
+  function sizeCanvases() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+    let r = scene.getBoundingClientRect();
+    SW = r.width; SH = r.height;
+    scene.width = Math.max(1, Math.round(SW * DPR)); scene.height = Math.max(1, Math.round(SH * DPR));
+    r = fbd.getBoundingClientRect();
+    FW = r.width; FH = r.height;
+    fbd.width = Math.max(1, Math.round(FW * DPR)); fbd.height = Math.max(1, Math.round(FH * DPR));
+    applyFit(0, true);
+    needsRender = true;
+  }
+
+  /* ---------- drawing helpers ---------- */
+  function tri(ctx, x, y, ux, uy, hl, hw) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - ux * hl - uy * hw, y - uy * hl + ux * hw);
+    ctx.lineTo(x - ux * hl + uy * hw, y - uy * hl - ux * hw);
+    ctx.closePath();
+    ctx.fill();
+  }
+  function arrow2(ctx, x0, y0, x1, y1, col, lw, dash) {
+    const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+    if (len < 1.5) return;
+    const ux = dx / len, uy = dy / len;
+    const hl = Math.min(10, Math.max(5, len * 0.4)), hw = hl * 0.48;
+    ctx.save();
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'butt';
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1 - ux * hl * 0.85, y1 - uy * hl * 0.85); ctx.stroke();
+    ctx.setLineDash([]);
+    tri(ctx, x1, y1, ux, uy, hl, hw);
+    ctx.restore();
+  }
+  function subLabel(ctx, main, sub, x, y, col, align, size) {
+    const fMain = `italic ${size}px ${SERIF}`, fSub = `${Math.round(size * 0.72)}px ${SANS}`;
+    ctx.save();
+    ctx.font = fMain; const w1 = ctx.measureText(main).width;
+    ctx.font = fSub; const w2 = sub ? ctx.measureText(sub).width + 1.5 : 0;
+    const tw = w1 + w2, cw = ctx.canvas.width / DPR;
+    let x0 = align === 'right' ? x - tw : align === 'center' ? x - tw / 2 : x;
+    x0 = Math.max(3, Math.min(x0, cw - tw - 3));
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = C.halo; ctx.lineWidth = 3.5; ctx.fillStyle = col;
+    ctx.font = fMain; ctx.strokeText(main, x0, y); ctx.fillText(main, x0, y);
+    if (sub) {
+      ctx.font = fSub;
+      const sy = y + size * 0.26;
+      ctx.strokeText(sub, x0 + w1 + 1.5, sy); ctx.fillText(sub, x0 + w1 + 1.5, sy);
+    }
+    ctx.restore();
+  }
+  function haloText(ctx, text, x, y) {
+    ctx.save();
+    ctx.lineJoin = 'round'; ctx.strokeStyle = C.halo; ctx.lineWidth = 4;
+    ctx.strokeText(text, x, y); ctx.restore();
+    ctx.fillText(text, x, y);
+  }
+
+  /* ---------- scene parts ---------- */
+  function vCyl(ctx, z0, z1, r, dark, light, cap) {
+    const b = P3(0, 0, z0), t = P3(0, 0, z1);
+    const wb = r * b.s, wt = r * t.s;
+    const se = Math.max(0, Math.sin(cam.elev));
+    const hb = Math.max(0.01, wb * se), ht = Math.max(0.01, wt * se);
+    const gr = ctx.createLinearGradient(t.x - wt, 0, t.x + wt, 0);
+    gr.addColorStop(0, dark); gr.addColorStop(0.32, light); gr.addColorStop(0.62, dark); gr.addColorStop(1, dark);
+    ctx.fillStyle = gr;
+    ctx.beginPath();
+    ctx.moveTo(t.x - wt, t.y);
+    ctx.lineTo(b.x - wb, b.y);
+    ctx.ellipse(b.x, b.y, wb, hb, 0, Math.PI, 0, true);
+    ctx.lineTo(t.x + wt, t.y);
+    ctx.ellipse(t.x, t.y, wt, ht, 0, 0, Math.PI, true);
+    ctx.closePath();
+    ctx.fill();
+    if (cap && se > 0.03) {
+      ctx.fillStyle = cap;
+      ctx.beginPath(); ctx.ellipse(t.x, t.y, wt, ht, 0, 0, 2 * Math.PI); ctx.fill();
+    }
+  }
+  function drawColumn(ctx) {
+    vCyl(ctx, -1.8, -0.20, 0.0075, C.pole, C.poleHi, null);
+    vCyl(ctx, -0.20, -0.032, 0.021, C.motor, C.motorHi, C.motorHi);
+    vCyl(ctx, -0.074, -0.063, 0.0216, C.pole, C.poleHi, null);
+    vCyl(ctx, -0.032, 0, 0.0048, C.brassLo, C.brassHi, C.brass);
+  }
+  function drawHub(ctx) { vCyl(ctx, -0.003, ROD_H + 0.006, 0.0105, C.brassLo, C.brassHi, C.brass); }
+
+  function drawRodHalf(ctx, sign) {
+    const c = Math.cos(S.phi) * sign, s = Math.sin(S.phi) * sign;
+    const w = ROD_W / 2, len = ROD_HALF, h = ROD_H;
+    const W3 = (a, b, z) => [c * a - s * b, s * a + c * b, z];
+    const faces = [
+      { n: [0, 0, 1], pts: [[0, -w, h], [len, -w, h], [len, w, h], [0, w, h]], col: C.woodTop },
+      { n: [-s, c, 0], pts: [[0, w, 0], [len, w, 0], [len, w, h], [0, w, h]], col: C.woodSide },
+      { n: [s, -c, 0], pts: [[0, -w, 0], [len, -w, 0], [len, -w, h], [0, -w, h]], col: C.woodSide },
+      { n: [c, s, 0], pts: [[len, -w, 0], [len, w, 0], [len, w, h], [len, -w, h]], col: C.woodEnd }
+    ];
+    ctx.lineJoin = 'round';
+    for (const f of faces) {
+      const wp = f.pts.map((p) => W3(p[0], p[1], p[2]));
+      const mx = (wp[0][0] + wp[2][0]) / 2, my = (wp[0][1] + wp[2][1]) / 2, mz = (wp[0][2] + wp[2][2]) / 2;
+      const vis = f.n[0] * (camC[0] - mx) + f.n[1] * (camC[1] - my) + f.n[2] * (camC[2] - mz);
+      if (vis <= 0) continue;
+      const sp = wp.map((p) => P3(p[0], p[1], p[2]));
+      ctx.beginPath();
+      ctx.moveTo(sp[0].x, sp[0].y);
+      for (let i = 1; i < 4; i++) ctx.lineTo(sp[i].x, sp[i].y);
+      ctx.closePath();
+      ctx.fillStyle = f.col; ctx.fill();
+      ctx.strokeStyle = C.woodEdge; ctx.lineWidth = 0.6; ctx.stroke();
+    }
+  }
+  function drawString(ctx) {
+    const c = Math.cos(S.phi), s = Math.sin(S.phi);
+    const ax = P.D_ATT * c, ay = P.D_ATT * s;
+    const dx = ax - S.x, dy = ay - S.y, dz = -S.z, len = Math.hypot(dx, dy, dz) || 1;
+    const k = BALL_R * 0.92 / len;
+    const p0 = P3(ax, ay, 0), p1 = P3(S.x + dx * k, S.y + dy * k, S.z + dz * k);
+    ctx.save();
+    ctx.strokeStyle = C.string; ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+    ctx.restore();
+  }
+  function drawBall(ctx, b) {
+    const r = Math.max(2, BALL_R * b.s);
+    const gr = ctx.createRadialGradient(b.x - r * 0.38, b.y - r * 0.42, r * 0.08, b.x, b.y, r);
+    gr.addColorStop(0, C.redHi); gr.addColorStop(0.42, C.red); gr.addColorStop(1, C.redLo);
+    ctx.fillStyle = gr;
+    ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, 2 * Math.PI); ctx.fill();
+  }
+  function drawRing(ctx, back) {
+    const start = cam.azim + (back ? Math.PI / 2 : -Math.PI / 2);
+    ctx.save();
+    ctx.setLineDash([5, 5]); ctx.lineWidth = 1.2; ctx.strokeStyle = C.target; ctx.globalAlpha = back ? 0.6 : 0.95;
+    ctx.beginPath();
+    for (let i = 0; i <= 60; i++) {
+      const p = start + i / 60 * Math.PI;
+      const q = P3(P.R_PHOTO * Math.cos(p), P.R_PHOTO * Math.sin(p), P.Z_PHOTO);
+      if (i) ctx.lineTo(q.x, q.y); else ctx.moveTo(q.x, q.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  function trailDuration() { return Math.min(3.2, Math.max(0.4, 2 * Math.PI / Math.max(S.om, 0.5) * 0.97)); }
+  function drawTrail(ctx, back, axisZ) {
+    const n = trail.length;
+    if (n < 2) return;
+    const tNow = trail[n - 1].t, dur = trailDuration();
+    ctx.save();
+    ctx.strokeStyle = C.red; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    let prev = P3(trail[0].x, trail[0].y, trail[0].z);
+    for (let i = 1; i < n; i++) {
+      const p = trail[i], q = P3(p.x, p.y, p.z);
+      if (((prev.z + q.z) / 2 > axisZ) === back) {
+        const al = 0.6 * (1 - (tNow - p.t) / dur);
+        if (al > 0.02) {
+          ctx.globalAlpha = al;
+          ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+        }
+      }
+      prev = q;
+    }
+    ctx.restore();
+  }
+  function drawForces3D(ctx, m) {
+    const b = P3(S.x, S.y, S.z), k = Math.min(FORCE_SCALE, 0.3 / Math.max(m.Tmg, 1));
+    const tS = P3(S.x + m.ex * m.Tmg * k, S.y + m.ey * m.Tmg * k, S.z + m.ez * m.Tmg * k);
+    const tE = P3(S.x, S.y, S.z - k);
+    arrow2(ctx, b.x, b.y, tE.x, tE.y, C.orange, 2.4);
+    arrow2(ctx, b.x, b.y, tS.x, tS.y, C.blue, 2.4);
+    tipLabel(ctx, b, tE, 'F', 'E on Sp', C.orange);
+    sideLabel(ctx, b, tS, 'F', 'S on Sp', C.blue);
+  }
+  function sideLabel(ctx, from, to, main, sub, col) {
+    const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    let nx = -uy, ny = ux;
+    const ax = P3(0, 0, S.z);
+    if ((ax.x - to.x) * nx + (ax.y - to.y) * ny > 0) { nx = -nx; ny = -ny; }
+    const back = Math.min(12, len * 0.3);
+    const x = to.x - ux * back + nx * 12, y = to.y - uy * back + ny * 12;
+    const align = nx > 0.3 ? 'left' : nx < -0.3 ? 'right' : 'center';
+    subLabel(ctx, main, sub, x, y + 5, col, align, 15);
+  }
+  function tipLabel(ctx, from, to, main, sub, col) {
+    const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    const x = to.x + ux * 8, y = to.y + uy * 8;
+    const align = ux > 0.35 ? 'left' : ux < -0.35 ? 'right' : 'center';
+    const yy = uy > 0.35 ? y + 13 : uy < -0.35 ? y - 1 : y + 5;
+    subLabel(ctx, main, sub, x, yy, col, align, 15);
+  }
+
+  /* dimension lines, drawn like the photo's annotations */
+  function dimLine(ctx, a, b, text, side) {
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+    if (len < 10) return;
+    const ux = dx / len, uy = dy / len, hl = 7, hw = 3;
+    ctx.beginPath(); ctx.moveTo(a.x + ux * hl, a.y + uy * hl); ctx.lineTo(b.x - ux * hl, b.y - uy * hl); ctx.stroke();
+    tri(ctx, a.x, a.y, -ux, -uy, hl, hw);
+    tri(ctx, b.x, b.y, ux, uy, hl, hw);
+    let ang = Math.atan2(dy, dx);
+    if (ang > Math.PI / 2) ang -= Math.PI;
+    if (ang < -Math.PI / 2) ang += Math.PI;
+    const nx = -Math.sin(ang), ny = Math.cos(ang);
+    const mx = (a.x + b.x) / 2 + nx * side * 12, my = (a.y + b.y) / 2 + ny * side * 12;
+    ctx.save();
+    ctx.translate(mx, my); ctx.rotate(ang);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `700 13px ${SANS}`;
+    haloText(ctx, text, 0, 0);
+    ctx.restore();
+  }
+  function seg(ctx, a, b) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+  function drawDimensions(ctx, m) {
+    const c = Math.cos(S.phi), s = Math.sin(S.phi);
+    const ax = P.D_ATT * c, ay = P.D_ATT * s;
+    const A = P3(ax, ay, 0), B = P3(S.x, S.y, S.z);
+    const R = m.R, br = BALL_R * B.s;
+    ctx.save();
+    ctx.strokeStyle = C.dim; ctx.fillStyle = C.dim; ctx.lineWidth = 1;
+
+    // distance from the axis, just below the sphere
+    const zr = S.z - 0.06;
+    seg(ctx, P3(S.x, S.y, S.z - BALL_R - 0.006), P3(S.x, S.y, zr - 0.014));
+    dimLine(ctx, P3(S.x, S.y, zr), P3(0, 0, zr), `${fmt(R * 100, 1)} cm`, 1);
+
+    // tie-point offset, above the rod
+    const zd = 0.05;
+    seg(ctx, P3(ax, ay, ROD_H + 0.006), P3(ax, ay, zd + 0.014));
+    seg(ctx, P3(0, 0, ROD_H + 0.012), P3(0, 0, zd + 0.014));
+    dimLine(ctx, P3(ax, ay, zd), P3(0, 0, zd), `${fmt(P.D_ATT * 100, 1)} cm`, -1);
+
+    // string length, parallel to the string on the outside
+    const dx = A.x - B.x, dy = A.y - B.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    let nx = uy, ny = -ux;
+    if (nx > 0) { nx = -nx; ny = -ny; }
+    const off = 20;
+    seg(ctx, { x: A.x + nx * 5, y: A.y + ny * 5 }, { x: A.x + nx * (off + 6), y: A.y + ny * (off + 6) });
+    seg(ctx, { x: B.x + nx * (br + 4), y: B.y + ny * (br + 4) }, { x: B.x + nx * (off + 6), y: B.y + ny * (off + 6) });
+    dimLine(ctx, { x: B.x + nx * off, y: B.y + ny * off }, { x: A.x + nx * off, y: A.y + ny * off }, `${fmt(P.L * 100, 1)} cm`, -1);
+
+    // angle between the string and the horizontal
+    const Ax = P3(0, 0, S.z);
+    let hx = Ax.x - B.x, hy = Ax.y - B.y;
+    const hlen = Math.hypot(hx, hy) || 1; hx /= hlen; hy /= hlen;
+    const a0 = Math.atan2(hy, hx), a1 = Math.atan2(A.y - B.y, A.x - B.x);
+    const span = Math.abs(a1 - a0);
+    const ra = Math.min(Math.max(30, br + 16, 20 / Math.max(Math.sin(span), 0.05)), len * 0.55);
+    ctx.save(); ctx.setLineDash([2, 3]);
+    seg(ctx, { x: B.x + hx * (br + 2), y: B.y + hy * (br + 2) }, { x: B.x + hx * (ra + 26), y: B.y + hy * (ra + 26) });
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(B.x, B.y, ra, a0, a1, a1 < a0); ctx.stroke();
+    const am = (a0 + a1) / 2;
+    ctx.font = `700 13px ${SANS}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    haloText(ctx, `${fmt(m.theta / DEG, 1)}°`, B.x + Math.cos(am) * (ra + 6), B.y + Math.sin(am) * (ra + 6));
+    ctx.restore();
+  }
+
+  function drawScene(m) {
+    const ctx = ctxS;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, SW, SH);
+    if (SW < 10) return;
+    updateCamera();
+    const axisZ = cam.D;
+    const ball = P3(S.x, S.y, S.z);
+    const c = Math.cos(S.phi), s = Math.sin(S.phi);
+    const items = [];
+    if (!photoMode) { drawRing(ctx, true); drawTrail(ctx, true, axisZ); }
+    items.push({ d: axisZ + 0.025, f: () => drawColumn(ctx) });
+    items.push({ d: axisZ - 0.02, f: () => drawHub(ctx) });
+    for (const sign of [1, -1]) {
+      const mid = P3(c * sign * ROD_HALF / 2, s * sign * ROD_HALF / 2, ROD_H / 2);
+      items.push({ d: mid.z, f: () => drawRodHalf(ctx, sign) });
+    }
+    const ms = P3((P.D_ATT * c + S.x) / 2, (P.D_ATT * s + S.y) / 2, S.z / 2);
+    items.push({ d: ms.z, f: () => drawString(ctx) });
+    items.push({ d: ball.z, f: () => drawBall(ctx, ball) });
+    if (!photoMode) {
+      const dFront = Math.min(axisZ - 0.002, Math.max(ball.z + 0.0005, axisZ - 0.05));
+      items.push({ d: dFront, f: () => { drawRing(ctx, false); drawTrail(ctx, false, axisZ); } });
+    }
+    items.sort((a, b) => b.d - a.d);
+    for (const it of items) it.f();
+    if (photoMode) drawDimensions(ctx, m);
+    else if (showForces) drawForces3D(ctx, m);
+  }
+
+  /* ---------- force diagram ---------- */
+  function drawFBD(m) {
+    const ctx = ctxF;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, FW, FH);
+    if (FW < 60) return;
+    const hS = m.hS, vS = m.vS, aH = m.aH;
+    const up = Math.max(vS, 0.25), down = 1;
+    const ox = Math.round(Math.min(112, Math.max(76, FW * 0.27)));
+    const head = 36, rowA = 46, bot = 12;
+    const scV = (FH - head - rowA - bot) / (up + down);
+    const scH = (FW - ox - 78) / Math.max(hS, aH, 0.25);
+    const sc = Math.max(6, Math.min(scV, scH, 130));
+    const top = head + Math.max(0, (FH - head - rowA - bot - (up + down) * sc) / 2);
+    const oy = top + up * sc;
+    const tx = ox + hS * sc, ty = oy - vS * sc;
+
+    // axes
+    ctx.save();
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(ox - 46, oy); ctx.lineTo(FW - 12, oy);
+    ctx.moveTo(ox, top - 24); ctx.lineTo(ox, oy + down * sc + 10);
+    ctx.stroke();
+    ctx.fillStyle = C.ink3; ctx.font = `12px ${SANS}`; ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'right'; ctx.fillText('toward the axis', FW - 12, oy - 8);
+    ctx.textAlign = 'left'; ctx.fillText('up', ox + 7, top - 14);
+    ctx.restore();
+
+    // construction lines and components of the string's force
+    ctx.save();
+    ctx.strokeStyle = C.blue; ctx.globalAlpha = 0.45; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+    ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx, oy); ctx.moveTo(tx, ty); ctx.lineTo(ox, ty); ctx.stroke();
+    ctx.restore();
+    arrow2(ctx, ox, oy, tx, oy, C.blue, 1.6, [5, 4]);
+    arrow2(ctx, ox, oy, ox, ty, C.blue, 1.6, [5, 4]);
+
+    // forces
+    arrow2(ctx, ox, oy, ox, oy + down * sc, C.orange, 2.6);
+    arrow2(ctx, ox, oy, tx, ty, C.blue, 2.6);
+
+    // angle
+    const fl = Math.hypot(tx - ox, ty - oy);
+    if (hS > 0.03 && fl > 30) {
+      const ang = Math.atan2(ty - oy, tx - ox);
+      const ra = Math.min(Math.max(26, 20 / Math.max(Math.sin(Math.abs(ang)), 0.05)), fl * 0.6);
+      ctx.save();
+      ctx.strokeStyle = C.ink2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(ox, oy, ra, 0, ang, ang < 0); ctx.stroke();
+      ctx.restore();
+      subLabel(ctx, 'θ', '', ox + Math.cos(ang / 2) * (ra + 7), oy + Math.sin(ang / 2) * (ra + 7) + 5, C.ink2, 'left', 14);
+    }
+
+    // sphere
+    ctx.fillStyle = C.red;
+    ctx.beginPath(); ctx.arc(ox, oy, 6, 0, 2 * Math.PI); ctx.fill();
+
+    // labels
+    subLabel(ctx, 'F', 'E on Sp', ox - 10, oy + down * sc * 0.72 + 5, C.orange, 'right', 15);
+    const roomRight = FW - (tx + 10);
+    if (roomRight > 74) subLabel(ctx, 'F', 'S on Sp', tx + 10, ty + 6, C.blue, 'left', 15);
+    else subLabel(ctx, 'F', 'S on Sp', tx, ty - 10, C.blue, 'right', 15);
+
+    // m·a, drawn on the same scale as the forces
+    const ya = oy + down * sc + 30;
+    ctx.save();
+    ctx.strokeStyle = C.rule; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ox, ya - 9); ctx.lineTo(ox, ya + 9); ctx.stroke();
+    ctx.restore();
+    arrow2(ctx, ox, ya, ox + aH * sc, ya, C.green, 2.6);
+    ctx.save();
+    ctx.fillStyle = C.green; ctx.textBaseline = 'alphabetic';
+    const lx = Math.min(Math.max(ox + aH * sc, ox) + 9, FW - 34);
+    ctx.font = `italic 15px ${SERIF}`; ctx.textAlign = 'left';
+    ctx.fillText('m', lx, ya + 5);
+    const wm = ctx.measureText('m').width;
+    ctx.font = `600 15px ${SERIF}`; ctx.fillText('a', lx + wm + 1, ya + 5);
+    ctx.restore();
+  }
+
+  /* ---------- trail ---------- */
+  function pushTrail() {
+    trail.push({ x: S.x, y: S.y, z: S.z, t: simTime });
+    const cut = simTime - trailDuration();
+    let i = 0;
+    while (i < trail.length - 2 && trail[i].t < cut) i++;
+    if (i) trail.splice(0, i);
+  }
+  function fillSteadyTrail() {
+    trail = [];
+    const om = S.om, dur = trailDuration(), N = 120;
+    for (let j = N; j >= 0; j--) {
+      const tau = dur * j / N, a = -om * tau, c = Math.cos(a), s = Math.sin(a);
+      trail.push({ x: S.x * c - S.y * s, y: S.x * s + S.y * c, z: S.z, t: simTime - tau });
+    }
+  }
+  function rotateTrail(delta) {
+    const c = Math.cos(delta), s = Math.sin(delta);
+    for (const p of trail) { const x = p.x * c - p.y * s, y = p.x * s + p.y * c; p.x = x; p.y = y; }
+  }
+
+  /* ---------- readings ---------- */
+  const el = {
+    status: $('status'), statusText: $('statusText'), rTheta: $('rTheta'), rR: $('rR'), rV: $('rV'), rF: $('rF'),
+    cTheta: $('cTheta'), cR: $('cR'), settle: $('settle'), eqV: $('eqV'), eqH: $('eqH'), eqS: $('eqS'),
+    periodOut: $('periodOut'), period: $('period'), angleOut: $('angleOut'), angle: $('angle'),
+    photoNote: $('photoNote'), speedTag: $('speedTag'),
+    playBtn: $('playBtn'), slowBtn: $('slowBtn'), forcesChk: $('forcesChk')
+  };
+  const presetBtns = [...document.querySelectorAll('.preset')];
+  const viewBtns = [...document.querySelectorAll('.seg button')];
+
+  function updateSteadyFlag() {
+    const rs = P.relSpeed(), dw = Math.abs(S.om - P.omTarget);
+    if (steady) { if (rs > 0.015 || dw > 0.01) steady = false; }
+    else if (rs < 0.008 && dw < 0.004) steady = true;
+  }
+  function setCmp(node, ok, text) {
+    node.textContent = (steady && ok ? '✓ ' : '') + text;
+    node.classList.toggle('ok', steady && ok);
+    node.classList.toggle('no', steady && !ok);
+  }
+  function setEq(node, a, b) {
+    const same = Math.abs(a - b) <= 0.015 * Math.max(Math.abs(a), Math.abs(b), 0.05);
+    node.innerHTML = `${fmt(a, 2)} <i>mg</i> ${same ? '=' : '≠'} ${fmt(b, 2)} <i>mg</i>`;
+    node.classList.toggle('ok', same);
+    node.classList.toggle('no', !same);
+  }
+  function updateUI(m) {
+    const th = m.theta / DEG, Rcm = m.R * 100;
+    el.rTheta.textContent = `${fmt(th, 1)}°`;
+    el.rR.textContent = `${fmt(Rcm, 1)} cm`;
+    el.rV.textContent = `${fmt(m.v, 2)} m/s`;
+    el.rF.innerHTML = `${fmt(m.Tmg, 2)} <i>mg</i>`;
+    const okTh = Math.abs(th - 60) <= 1, okR = Math.abs(Rcm - 36) <= 1;
+    setCmp(el.cTheta, okTh, 'Photo: 60°');
+    setCmp(el.cR, okR, 'Photo: 36.0 cm');
+    let state = 'nomatch', text = 'Doesn’t match the photo';
+    if (!steady) { state = 'wait'; text = 'Settling…'; }
+    else if (okTh && okR) { state = 'match'; text = 'Matches the photo'; }
+    if (el.status.dataset.state !== state) { el.status.dataset.state = state; el.statusText.textContent = text; }
+    const geo = P.steadyGeometry(P.omTarget);
+    el.settle.innerHTML = `Steady motion at <i class="m">T</i> = ${fmt(Tset, 2)} s: string at ${fmt(geo.theta / DEG, 1)}° from horizontal, sphere ${fmt(geo.R * 100, 1)} cm from the axis.`;
+    setEq(el.eqV, m.vS, 1);
+    setEq(el.eqH, m.hS, m.mv2R);
+    setEq(el.eqS, m.Tmg, m.mv2R);
+  }
+
+  /* ---------- controls ---------- */
+  function exitPhoto() { photoMode = false; el.photoNote.hidden = true; }
+  function alignPhoto() {
+    const want = Math.atan2(-Math.cos(cam.azim), Math.sin(cam.azim));
+    const delta = want - Math.atan2(S.y, S.x);
+    P.rotateAbout(delta);
+    rotateTrail(delta);
+  }
+  function setPlaying(on) {
+    playing = on;
+    if (on) exitPhoto();
+    el.playBtn.innerHTML = (on ? ICON_PAUSE : ICON_PLAY) + `<span>${on ? 'Pause' : 'Play'}</span>`;
+    needsRender = true; forceUI = true;
+  }
+  function syncViewButtons() {
+    for (const b of viewBtns) b.setAttribute('aria-pressed', String(Math.abs(cam.elev - VIEW_ELEV[b.dataset.view]) < 0.5 * DEG));
+  }
+  function setPeriod(T, source, thChosen) {
+    Tset = Math.min(3, Math.max(0.5, T));
+    P.omTarget = 2 * Math.PI / Tset;
+    if (source !== 'period') el.period.value = Tset.toFixed(2);
+    el.periodOut.innerHTML = `<i>T</i> = ${fmt(Tset, 2)} s`;
+    el.period.setAttribute('aria-valuetext', `${fmt(Tset, 2)} seconds`);
+    const thDeg = source === 'angle' ? thChosen : P.steadyGeometry(P.omTarget).theta / DEG;
+    if (source !== 'angle') el.angle.value = thDeg.toFixed(1);
+    el.angleOut.innerHTML = `<i>θ</i> = ${fmt(thDeg, 1)}°`;
+    el.angle.setAttribute('aria-valuetext', `${fmt(thDeg, 1)} degrees`);
+    for (const b of presetBtns) {
+      const target = b.dataset.preset === 'students' ? T_STUDENTS : P.T_CORRECT;
+      b.setAttribute('aria-pressed', String(Math.abs(Tset - target) < 0.006));
+    }
+    if (!playing) {
+      P.setSteady(P.omTarget);
+      fillSteadyTrail();
+      if (photoMode) alignPhoto();
+      resetHold();
+      steady = true;
+    }
+    needsRender = true; forceUI = true;
+  }
+
+  el.period.addEventListener('input', () => setPeriod(parseFloat(el.period.value), 'period'));
+  el.angle.addEventListener('input', () => {
+    const th = parseFloat(el.angle.value);
+    setPeriod(P.periodForAngle(th * DEG), 'angle', th);
+  });
+  for (const b of presetBtns) b.addEventListener('click', () => setPeriod(b.dataset.preset === 'students' ? T_STUDENTS : P.T_CORRECT));
+  el.playBtn.addEventListener('click', () => setPlaying(!playing));
+  el.slowBtn.addEventListener('click', () => {
+    slow = !slow;
+    el.slowBtn.setAttribute('aria-pressed', String(slow));
+    el.speedTag.hidden = !slow;
+  });
+  $('photoBtn').addEventListener('click', () => {
+    setPlaying(false);
+    cam.elev = VIEW_ELEV.side;
+    photoMode = true;
+    el.photoNote.hidden = false;
+    P.setSteady(P.omTarget);
+    fillSteadyTrail();
+    steady = true;
+    alignPhoto();
+    resetHold();
+    syncViewButtons(); applyFit(0, true);
+    needsRender = true; forceUI = true;
+  });
+  $('restartBtn').addEventListener('click', () => {
+    exitPhoto();
+    P.restFromHanging();
+    resetHold();
+    trail = [];
+    steady = false;
+    setPlaying(true);
+  });
+  for (const b of viewBtns) b.addEventListener('click', () => {
+    cam.elev = VIEW_ELEV[b.dataset.view];
+    if (b.dataset.view !== 'side') exitPhoto();
+    syncViewButtons(); applyFit(0, true);
+    needsRender = true;
+  });
+  el.forcesChk.addEventListener('change', () => { showForces = el.forcesChk.checked; needsRender = true; });
+  $('demoStudents').addEventListener('click', () => {
+    exitPhoto();
+    cam.elev = VIEW_ELEV.angled;
+    syncViewButtons(); applyFit(0, true);
+    setPlaying(true);
+    setPeriod(T_STUDENTS);
+    $('stage').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  // drag to turn the camera (vertical drags also tilt it with a mouse or pen)
+  let drag = null;
+  scene.addEventListener('pointerdown', (e) => {
+    drag = { x: e.clientX, y: e.clientY, az: cam.azim, el: cam.elev, id: e.pointerId, moved: false };
+    try { scene.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+  });
+  scene.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+    drag.moved = true;
+    if (photoMode) exitPhoto();
+    cam.azim = drag.az - dx * 0.008;
+    if (e.pointerType !== 'touch') cam.elev = Math.max(0, Math.min(85 * DEG, drag.el + dy * 0.006));
+    syncViewButtons(); applyFit(0, true);
+    needsRender = true;
+  });
+  const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; };
+  scene.addEventListener('pointerup', endDrag);
+  scene.addEventListener('pointercancel', endDrag);
+
+  // theme and size
+  const onTheme = () => { readColors(); needsRender = true; };
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  if (mq.addEventListener) mq.addEventListener('change', onTheme); else mq.addListener(onTheme);
+  new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => sizeCanvases());
+    ro.observe(scene); ro.observe(fbd);
+  }
+  window.addEventListener('resize', sizeCanvases);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { needsRender = true; forceUI = true; });
+
+  /* ---------- start ---------- */
+  readColors();
+  S.phi = -0.35;
+  P.setSteady(P.omTarget);
+  fillSteadyTrail();
+  setPeriod(P.T_CORRECT);
+  setPlaying(playing);
+  resetHold();
+  sizeCanvases();
+
+  let last = performance.now(), lastUI = 0;
+  function frame(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+    last = now;
+    if (playing && dt > 0) {
+      const sdt = dt * (slow ? 0.25 : 1);
+      P.advance(sdt);
+      simTime += sdt;
+      pushTrail();
+      updateHold(sdt);
+      needsRender = true;
+    }
+    if (applyFit(dt, false)) needsRender = true;
+    if (needsRender) {
+      const m = P.measure();
+      updateSteadyFlag();
+      drawScene(m);
+      drawFBD(m);
+      if (forceUI || now - lastUI > 90) { updateUI(m); lastUI = now; forceUI = false; }
+      needsRender = false;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
